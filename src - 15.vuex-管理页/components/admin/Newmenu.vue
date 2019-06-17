@@ -1,0 +1,66 @@
+<template>
+    <div class="mt-5">
+      <h3 class="text-center">菜单管理</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">序号</th>
+      <th scope="col">品种</th>
+      <th scope="col">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="(item,index) in newmenu" :key="index">
+      <td scope="row">{{index+1}}</td>
+      <td>{{item.name}}</td>
+      <td><button class="btn btn-danger" @click="deleteItem(item,index)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+</template>
+
+<script>
+import axios from 'axios'
+    export default {
+       name:'Newmenu',
+       data(){
+         return{
+          //  newmenu:[]  
+         }  
+       },
+       mounted(){
+         axios.get('./jsx-menu.json')
+         .then(res=>{
+            const result =[] 
+            for(let key in res.data){
+                const item =res.data[key]
+                // console.log(key)
+                item.id=key
+                result.push(item)
+            }
+            // console.log(this.newmenu)
+            this.$store.commit('setMenuItems',result)
+         })  
+       },
+       methods:{
+         deleteItem(item,index){
+            console.log(item.id)
+            axios.delete('./jsx-menu/'+item.id+'.json') 
+            .then(res=>{
+              console.log('删除成功')
+              this.$store.commit('deleteMenuItems',index)  
+            })  
+         }  
+      },
+      computed:{
+        newmenu(){
+          return this.$store.getters.getMenuItems
+        }
+      }
+    }
+</script>
+
+<style  scoped>
+  td,th{text-align: center;}
+</style>
